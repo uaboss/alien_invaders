@@ -9,8 +9,9 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
     if event.key == pygame.K_LEFT:
         ship.moving_left = True
     if event.key == pygame.K_SPACE:
-        new_bullet = Bullet(ai_settings, screen, ship)
-        bullets.add(new_bullet)
+        fire_bullet(ai_settings, screen, ship, bullets)
+    if event.key == pygame.K_q:
+        sys.exit()
 
 
 def check_keyup_events(event, ship):
@@ -31,11 +32,25 @@ def check_events(ai_settings, screen, ship, bullets):
             check_keyup_events(event, ship)
 
 
-def update_screen(ai_settings, screen, ship, bullets, myfont):
+def update_screen(ai_settings, screen, ship, alien, bullets, myfont):
     screen.fill(ai_settings.bg_color) # fill main window solid color
     for bullet in bullets.sprites():
         bullet.draw_bullet()
-    textsurface = myfont.render(str(len(bullets)), False, (0, 0, 0))
-    screen.blit(textsurface, (0, 0))
+    # textsurface = myfont.render(str(len(bullets)), False, (0, 0, 0))
+    # screen.blit(textsurface, (0, 0))
     ship.blitme()
+    alien.blitme()
     pygame.display.flip() # redraw all object in main window
+
+
+def update_bullets(bullets):
+    bullets.update()
+    for bullet in bullets.copy():
+        if bullet.rect.bottom <= 0:
+            bullets.remove(bullet)
+
+
+def fire_bullet(ai_settings, screen, ship, bullets):
+    if len(bullets) < ai_settings.bullets_allowed:
+        new_bullet = Bullet(ai_settings, screen, ship)
+        bullets.add(new_bullet)
